@@ -1,5 +1,10 @@
 'using strict';
 
+/**
+ * 
+ * 
+ * @param   {string} tableClassName [[Селектор блока, где хранится строка]]
+ */
 function SmartTable(tableClassName) {
     var row_count = SmartTable.TABLE_DEFAULT_ROW;
     var column_count = SmartTable.TABLE_DEFAULT_COLUMN;
@@ -11,10 +16,16 @@ function SmartTable(tableClassName) {
         setEventListenter();
     }
 
+    /**
+     * [[Вставляет сгенерированную HTML разметку в блок]]
+     */
     function setHTML() {
         document.querySelector(tableClassName).innerHTML = getHTML();
     }
 
+    /**
+     * [[Добавляет event listeners]]
+     */
     function setEventListenter() {
         document.querySelectorAll(tableClassName + ' .inner-container table tr td').forEach(function (item, i, elements) {
             item.addEventListener('mouseover', showButtons);
@@ -26,25 +37,49 @@ function SmartTable(tableClassName) {
             item.addEventListener('mouseout', buttonMouseOut);
         });
     }
+    /**
+     * [[Сетер для количества строк]]
+     * @param {[[number]]} number [[Новое количество строк]]
+     */
     this.setRowCount = function (number) {
         row_count = number >= 1 ? number : row_count;
     }
+    /**
+     * [[Сетер для количества колонок]]
+     * @param {[[number]]} number [[Новое количество строк]]
+     */
     this.setColumnCount = function (number) {
         column_count = number >= 1 ? number : column_count;
     }
+    /**
+     * 
+     * @returns {[[number]]} [[Возвращает количество строк]]
+     */
     this.getRowCount = function () {
         return row_count;
     }
+    /**
+     * 
+     * @returns {[[number]]} [[Возвращает количество столбцов]]
+     */
     this.getColumnCount = function () {
         return column_count;
     }
 
+    /**
+     * [[Возвращает готовую HTML разметку для таблицы]]
+     * @returns {[[string]]} [[html разметка]]
+     */
     function getHTML() {
         var html = getHTMLCodeOuterTable();
         html = html.replace('_inner-table', getHTMLCodeInnerTable());
         return html;
     }
 
+    /**
+     * [[Возвращает внешнюю html разметку(кнопки+контейнер для таблицы)]]
+     * @returns {[[Type]]} [[Description]]
+     */
     function getHTMLCodeOuterTable() {
         var isInsertInnerTable = false;
         var html = '<table class="outer-table">';
@@ -73,6 +108,10 @@ function SmartTable(tableClassName) {
         return html;
     }
 
+    /**
+     * [[Возвращает разметку для основной таблицы]]
+     * @returns {[[string]]} [[html]]
+     */
     function getHTMLCodeInnerTable() {
         var html = '<table class="inner-table">';
         for (var i = 0; i < that.getRowCount(); i++) {
@@ -86,7 +125,20 @@ function SmartTable(tableClassName) {
         return html;
     }
 
+    /**
+     * [[Изменяет прозрачность для кнопок удаления/добавления строк ил колонок]]
+     * @param {[[number]]} column  [[Строка на которой нужно показать кнопки]]
+     * @param {[[number]]} row     [[Колонка на которой нужно показать кнопки]]
+     * @param {[[number]]} opacity [[Значение прозрачности]]
+     */
     function changeOpacityButtons(column, row, opacity) {
+        /**
+         * [[Функция, которая должан изменить прозрачность кнопок строки или колонки]]
+         * @param {[[string]]} buttonType  [[Тип кнопки, прозрачность которой нужно изменить]]
+         * @param {[[number]]} opacity     [[Прозрачность]]
+         * @param {[[number]]} elemNumber  [[Номер строки или колонки]]
+         * @param {[[string]]} rowOrColumn [[Отвечает за изменение в колонке или строке]]
+         */
         function change(buttonType, opacity, elemNumber, rowOrColumn) {
             var query = tableClassName + ` table tr ${buttonType}[data-${rowOrColumn}='${elemNumber}']`;
             document.querySelectorAll(query).forEach(function (elem) {
@@ -107,6 +159,11 @@ function SmartTable(tableClassName) {
         change(columnButtonWhatShowSelector, opacity, column, 'column');
     }
 
+    /**
+     * [[Получить номер строки и колонки, где которые необходимо показать]]
+     * @param   {object} target [[Елемент на который навели курсором]]
+     * @returns {object} [[Объект с параметрами строки и колонки]]
+     */
     function getRowAndColumn(target) {
         var c = target.dataset.column * 1;
         var r = target.dataset.row * 1;
@@ -117,25 +174,41 @@ function SmartTable(tableClassName) {
             row: r
         };
     }
+
+    /**
+     * [[Функция, которая должна показать нужные кнопки]]
+     * @param {[[object]]} e [[объект события]]
+     */
     function showButtons(e) {
         var obj = getRowAndColumn(this);
         changeOpacityButtons(obj.column, obj.row, 1);
     }
-
+    /**
+     * [[Функция, которая должна спрятать не нужные кнопки]]
+     * @param {[[object]]} e [[объект события]]
+     */
     function hideButtons(e) {
         var obj = getRowAndColumn(this);
         changeOpacityButtons(obj.column, obj.row, 0);
     }
 
+    /**
+     * [[Функция, которая должна показать кнопку, на которую наведен курсор]]
+     * @param {[[object]]} e [[объект события]]
+     */
     function buttonOver(e) {
         if (this.dataset.isShow == 1) {
             this.style.opacity = 1;
         }
 
     }
+
+    /**
+     * [[Функция, которая изменяет размеры таблицы]]
+     * @param {[[object]]} e [[объект события]]
+     */
     function changeCountRowOrColumn(e) {
         if (this.style.opacity == 1) {
-
             var deleteOrAdd = this.innerHTML == SmartTable.TABLE_DELETE_CHAR ? -1 : 1;
             if (this.dataset.position == SmartTable.ROW_NAME) {
                 that.setRowCount(that.getRowCount() + deleteOrAdd);
@@ -145,6 +218,10 @@ function SmartTable(tableClassName) {
             that.start();
         }
     }
+    /**
+     * [[Функция, которая должна скрыть кнопку, на которую не наведен курсор]]
+     * @param {[[object]]} e [[объект события]]
+     */
     function buttonMouseOut(e) {
         this.dataset.isShow = 0;
         this.style.opacity = 0;
