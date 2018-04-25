@@ -1,0 +1,65 @@
+/*
+    colors:
+        -blue   #4dabe4
+        -red    #b00100
+        -yellow #f1a417
+        -yellow2 #f5bf5c
+        -red2 #c84d4c
+*/
+.table-container{
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    align-content: center; 
+    justify-content: center; 
+    overflow: auto;  
+}
+table tr td {
+    width: 50px;
+    height: 50px;
+    background-color: #4dabe4;
+}
+.st-container{
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    align-content: center; 
+    justify-content: center; 
+}
+
+.inner-table{
+     border: 1px solid #4dabe4;
+}
+.inner-container{
+    background-color:transparent;
+}
+.delete-btn{
+    background-color: #b00100;
+}
+.delete-btn:hover{
+    background-color: #c84d4c;
+    transition: background-color 1000ms linear;
+}
+.add-btn{
+    background-color: #f1a417;
+}
+.add-btn:hover{
+    background-color: #f5bf5c;
+    transition: background-color 1000ms linear;
+}
+.st-btn{
+    opacity: 0;
+    transition: opacity 0.5s;
+    text-align: center;
+    vertical-align: middle;
+    font-size:24px;
+    color:white;
+    font-weight: 500;
+}
