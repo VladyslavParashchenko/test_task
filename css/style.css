@@ -6,7 +6,7 @@
         -yellow2 #f5bf5c
         -red2 #c84d4c
 */
-.table-container{
+.container{
     width: 100%;
     position: fixed;
     top: 0;
@@ -17,38 +17,51 @@
     justify-content: center; 
     overflow: auto;  
 }
-table tr td {
+.table-container{
+    font-size:0px;
+}
+.table-container .inner-table tr td {
     width: 50px;
     height: 50px;
     background-color: #4dabe4;
 }
-.inner-table{
+.table-container .inner-table{
      border: 1px solid #4dabe4;
 }
-.inner-container{
+.table-container .inner-container{
     background-color:transparent;
 }
-.st-btn{
-    opacity: 0;
-    transition: opacity 0.5s;
+.table-container .st-btn{
     text-align: center;
     vertical-align: middle;
     font-size:24px;
     color:white;
     font-weight: 500;
     transition: background-color 500ms linear;
+    width: 50px;
+    height: 50px;
+    position: relative;
+    opacity: 0;
+    border:none;
+    transition: opacity 0.5s linear;
+    margin:2px;
 }
-.delete-btn{
+.table-container .delete-btn{
     background-color: #b00100;
 }
-.delete-btn:hover{
+.table-container .delete-btn:hover{
     background-color: #c84d4c;
 }
-.add-btn{
+.table-container .add-btn{
     background-color: #f1a417;
 }
-.add-btn:hover{
-    background-color: #f5bf5c;
-    
-}
 
+.table-container .add-btn:hover{
+    background-color: #f5bf5c;   
+}
+.table-container .column{
+    float: left;
+}
+.table-container .btn-show{
+    opacity: 1;
+}
