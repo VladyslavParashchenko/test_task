@@ -159,7 +159,7 @@ function SmartTable(tableClassName, _columnCount, _rowCount, _cellSize) {
      * @param {[[number]]} row        [[номер строки на которой должна находится кнопка]]
      */
     function showVerticalButton(buttonType, column, row) {
-        var button = document.querySelector(tableClassName+" "++buttonType);
+        var button = document.querySelector(tableClassName+" "+buttonType);
         row--;
         var top = row * cellSize + SmartTable.TABLE_BUTTON_DEFAULT_TOP_VALUE;
         top -= Math.round(row / 3) + 2;
