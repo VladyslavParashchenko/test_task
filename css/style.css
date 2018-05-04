@@ -61,14 +61,14 @@
    visibility: visible;
 }
 .table-container .left-delete-btn{
-    left:-53px;
+    right:100%;
 }
 .table-container .top-delete-btn{
-    top:-53px;
+    bottom:100%;
 }
 .table-container .bottom-add-btn{
-    top:220px;
+    top:100%;
 }
 .table-container .right-add-btn{
-    left:220px;
+    left:100%
 }
