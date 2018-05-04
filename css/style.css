@@ -18,21 +18,22 @@
     overflow: auto;  
 }
 .table-container{
+    position: relative;
     font-size:0px;
+    margin: 55px;
 }
 .table-container .inner-table tr td {
     width: 50px;
     height: 50px;
     background-color: #4dabe4;
+    border:none;
 }
 .table-container .inner-table{
      border: 1px solid #4dabe4;
 }
-.table-container .inner-container{
-    background-color:transparent;
-}
 .table-container .st-btn{
     text-align: center;
+    position: absolute;
     vertical-align: middle;
     font-size:24px;
     color:white;
@@ -40,19 +41,17 @@
     transition: background-color 500ms linear;
     width: 50px;
     height: 50px;
-    position: relative;
-    opacity: 0;
     border:none;
-    transition: opacity 0.5s linear;
     margin:2px;
+    visibility: hidden;
 }
-.table-container .delete-btn{
+.table-container .left-delete-btn,.table-container .top-delete-btn{
     background-color: #b00100;
 }
 .table-container .delete-btn:hover{
     background-color: #c84d4c;
 }
-.table-container .add-btn{
+.table-container .right-add-btn,.table-container .bottom-add-btn{
     background-color: #f1a417;
 }
 
@@ -63,5 +62,17 @@
     float: left;
 }
 .table-container .btn-show{
-    opacity: 1;
+   visibility: visible;
+}
+.table-container .left-delete-btn{
+    left:-53px;=
+}
+.table-container .top-delete-btn{
+    top:-53px;
+}
+.table-container .bottom-add-btn{
+    top:220px;
+}
+.table-container .right-add-btn{
+    left:220px;
 }

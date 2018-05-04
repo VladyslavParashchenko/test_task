@@ -30,20 +30,17 @@ function SmartTable(tableClassName, _columnCount, _rowCount, _cellSize) {
      * [[Добавляет event listeners]]
      */
     function setEventListenter() {
-        var query = tableClassName + ' table.inner-table tr td';
-        document.querySelectorAll(query).forEach(function (item, i, elements) {
-            item.addEventListener('mouseover', showButtons);
-        });
-        query = tableClassName + ' div.inner-content';
+        var query = tableClassName + ' table.inner-table';
+        document.querySelector(query).addEventListener('mouseover', showButtons);
         document.querySelector(query).addEventListener('mouseleave', hideButtons);
         document.querySelectorAll(tableClassName + ' .st-btn').forEach(function (item, i, elements) {
             item.addEventListener('mouseover', buttonOver);
             item.addEventListener('mouseout', buttonMouseOut);
         });
-        document.querySelector(tableClassName + ' .row-delete-btn').onclick = deleteRow;
-        document.querySelector(tableClassName + ' .row-add-btn').onclick = addRow;
-        document.querySelector(tableClassName + ' .column-add-btn').onclick = addColumn;
-        document.querySelector(tableClassName + ' .column-delete-btn').onclick = deleteColumn;
+        document.querySelector(tableClassName + ' .left-delete-btn').onclick = deleteRow;
+        document.querySelector(tableClassName + ' .right-add-btn').onclick = addColumn;
+        document.querySelector(tableClassName + ' .bottom-add-btn').onclick = addRow;
+        document.querySelector(tableClassName + ' .top-delete-btn').onclick = deleteColumn;
     }
     /**
      * [[Сетер для количества строк]]
@@ -89,26 +86,10 @@ function SmartTable(tableClassName, _columnCount, _rowCount, _cellSize) {
      * @returns {[[Type]]} [[Description]]
      */
     function getHTMLCodeOuterTable() {
-        var html = ` 
-        <div class="column">
-            <button class="st-btn delete-btn left-btn row-delete-btn vertical-btn">${SmartTable.TABLE_DELETE_CHAR}</button>
-        </div>
-        <div class="column">
-            <div class="level">
-                <button class="st-btn delete-btn top-btn column-delete-btn horizontal-btn">${SmartTable.TABLE_DELETE_CHAR}</button>
-            </div>
-            <div class="level middle-level">
-                <div class="inner-content">
-                    _inner_table
-                </div>
-                <div class="level">
-                    <button class="st-btn add-btn bottom-btn row-add-btn horizontal-btn">${SmartTable.TABLE_ADD_CHAR}</button>
-                </div>
-            </div>
-        </div>
-        <div class="column">
-            <button class="st-btn add-btn right-btn column-add-btn vertical-btn">${SmartTable.TABLE_ADD_CHAR}</button>
-        </div>`;
+        var html = `
+        <button class="st-btn left-delete-btn">${SmartTable.TABLE_DELETE_CHAR}</button>
+        <button class="st-btn top-delete-btn ">${SmartTable.TABLE_DELETE_CHAR}</button><button class="st-btn right-add-btn">${SmartTable.TABLE_ADD_CHAR}</button><button class="st-btn bottom-add-btn">${SmartTable.TABLE_ADD_CHAR}</button>
+        _inner_table`;
         return html;
     }
 
@@ -146,8 +127,7 @@ function SmartTable(tableClassName, _columnCount, _rowCount, _cellSize) {
      */
     function showHorizontButton(buttonType, column, row) {
         var button = document.querySelector(buttonType);
-        var left = column * cellSize + SmartTable.TABLE_BUTTON_DEFAULT_LEFT_VALUE;
-        left -= Math.round(column / 3) + 2;
+        var left = Math.round((column/that.getColumnCount())*getTableSizeParametr('width'));
         button.style.left = left + 'px';
         button.classList.add('btn-show');
     }
@@ -158,12 +138,10 @@ function SmartTable(tableClassName, _columnCount, _rowCount, _cellSize) {
      * @param {[[number]]} column     [[номер колонки на которой должна находится кнопка]]
      * @param {[[number]]} row        [[номер строки на которой должна находится кнопка]]
      */
-    function showVerticalButton(buttonType, column, row) {
+    function showVerticalButton(buttonType, column, row,parametr) {
         var button = document.querySelector(buttonType);
-        row--;
-        var top = row * cellSize + SmartTable.TABLE_BUTTON_DEFAULT_TOP_VALUE;
-        top -= Math.round(row / 3) + 2;
-        button.style.top = top + 'px';
+        var top = Math.round((row/that.getRowCount())*getTableSizeParametr('height'));
+        button.style['top'] = top + 'px';
         button.classList.add('btn-show');
     }
 
@@ -175,7 +153,6 @@ function SmartTable(tableClassName, _columnCount, _rowCount, _cellSize) {
     function getRowAndColumn(target) {
         var c = target.dataset.column * 1;
         var r = target.dataset.row * 1;
-        r++;
         return {
             column: c,
             row: r
@@ -187,18 +164,21 @@ function SmartTable(tableClassName, _columnCount, _rowCount, _cellSize) {
      * @param {[[object]]} e [[объект события]]
      */
     function showButtons(e) {
-        var obj = getRowAndColumn(this);
-        currentColumn = obj.column;
-        currentRow = obj.row;
-        if (that.getColumnCount() > 1) {
-            showHorizontButton(tableClassName + ' .top-btn', obj.column, obj.row);
+        if (e.target.tagName == 'TD') {
+            var element = e.target;
+            var obj = getRowAndColumn(element);
+            currentColumn = obj.column;
+            currentRow = obj.row;
+            if (that.getColumnCount() > 1) {
+                showHorizontButton(tableClassName + ' .top-delete-btn', obj.column, obj.row);
+            }
+            showHorizontButton(tableClassName + ' .bottom-add-btn', obj.column, obj.row);
+            if (that.getRowCount() > 1) {
+                showVerticalButton(tableClassName + ' .left-delete-btn', obj.column, obj.row);
+            }
+            showVerticalButton(tableClassName + ' .right-add-btn', obj.column, obj.row);
+            isUserReturnCursor = false;
         }
-        showHorizontButton(tableClassName + ' .bottom-btn', obj.column, obj.row);
-        if (that.getRowCount() > 1) {
-            showVerticalButton(tableClassName + ' .left-btn', obj.column, obj.row);
-        }
-        showVerticalButton(tableClassName + ' .right-btn', obj.column, obj.row);
-        isUserReturnCursor = false;
     }
     /**
      * [[Функция, которая должна спрятать не нужные кнопки]]
@@ -207,7 +187,7 @@ function SmartTable(tableClassName, _columnCount, _rowCount, _cellSize) {
     function hideButtons(e) {
         isUserReturnCursor = true;
         setTimeout(() => {
-            document.querySelectorAll(tableClassName+' .st-btn').forEach(function (element) {
+            document.querySelectorAll(tableClassName + ' .st-btn').forEach(function (element) {
                 if (isUserReturnCursor) {
                     element.classList.remove('btn-show');
                 }
@@ -242,59 +222,54 @@ function SmartTable(tableClassName, _columnCount, _rowCount, _cellSize) {
      * @param {[[object]]} e [[объект события]]
      */
     function deleteRow(e) {
-        if (this.classList.contains('btn-show')) {
-            currentRow--;
-            var query = tableClassName + ` td[data-row='${currentRow}']`;
-            document.querySelector(query).parentNode.remove();
-            that.setRowCount(that.getRowCount() - 1);
-            this.classList.remove('btn-show');
-            renumarateTd();
-        }
+        var query = tableClassName + ` td[data-row='${currentRow}']`;
+        document.querySelector(query).parentNode.remove();
+        that.setRowCount(that.getRowCount() - 1);
+        this.classList.remove('btn-show');
+        document.querySelector(tableClassName + ' .bottom-add-btn').style.top = that.getRowCount() * cellSize + 'px';
+        renumarateTd();S
+        moveBottomButton();
     }
     /**
      * [[Удаляет колонку в таблице]]
      * @param {[[object]]} e [[объект события]]
      */
     function deleteColumn(e) {
-        if (this.classList.contains('btn-show')) {
-            this.classList.remove('btn-show');
-            var query = tableClassName + ` td[data-column='${currentColumn}']`;
-            document.querySelectorAll(query).forEach(function (elem) {
-                elem.remove()
-            });
-            that.setColumnCount(that.getColumnCount() - 1);
-            renumarateTd();
-        }
+        this.classList.remove('btn-show');
+        var query = tableClassName + ` td[data-column='${currentColumn}']`;
+        document.querySelectorAll(query).forEach(function (elem) {
+            elem.remove()
+        });
+        that.setColumnCount(that.getColumnCount() - 1);
+        renumarateTd();
+        moveRightButton();
     }
     /**
      * [[Добавляет новую строку в таблицу]]
      * @param {[[object]]} e [[объект события]]
      */
     function addRow(e) {
-        if (this.classList.contains('btn-show')) {
-            var tr = "<tr>";
-            for (var i = 0; i < that.getColumnCount(); i++) {
-                tr += generateTd(i, that.getRowCount());
-            }
-            tr += "</tr>";
-            that.setRowCount(that.getRowCount() + 1);
-            document.querySelector(tableClassName + " table tbody").innerHTML += tr;
-            setEventListenter();
+        var tr = "<tr>";
+        for (var i = 0; i < that.getColumnCount(); i++) {
+            tr += generateTd(i, that.getRowCount());
         }
+        tr += "</tr>";
+        that.setRowCount(that.getRowCount() + 1);
+        document.querySelector(tableClassName + " table tbody").innerHTML += tr;
+        moveBottomButton();
     }
     /**
      * [[Добавляет новую колонку в таблицу]]
      * @param {[[object]]} e [[объект события]]
      */
     function addColumn(e) {
-        if (this.classList.contains('btn-show')) {
-            document.querySelectorAll(tableClassName + " table tbody tr").forEach(function (item, i) {
-                item.innerHTML += generateTd(that.getColumnCount(), i);
-            });
+        document.querySelectorAll(tableClassName + " table tbody tr").forEach(function (item, i) {
+            item.innerHTML += generateTd(that.getColumnCount(), i);
+        });
 
-            that.setColumnCount(that.getColumnCount() + 1);
-            setEventListenter();
-        }
+        that.setColumnCount(that.getColumnCount() + 1);
+        moveRightButton();
+        
     }
 
     /**
@@ -313,7 +288,28 @@ function SmartTable(tableClassName, _columnCount, _rowCount, _cellSize) {
             }
         }
     }
-
+    /**
+     * [[Изменяет положения right button]]
+     */
+    function moveRightButton(){
+        var width = getTableSizeParametr("width");
+        document.querySelector(tableClassName + ' .right-add-btn').style.left = width+ 'px';
+    }
+    /**
+     * [[Изменяет положения bottom button]]
+     */
+    function moveBottomButton(){
+        var height = getTableSizeParametr("height");
+        document.querySelector(tableClassName + ' .bottom-add-btn').style.top = height+ 'px';
+    }
+    /**
+     * [[Функция для получения значения размеров таблицы]]
+     * @param   {[[string]} parametr [[параметр который мы получим]]
+     * @returns {[[number]]} [[значения параметра]]
+     */
+    function getTableSizeParametr(parametr){
+        return document.querySelector(tableClassName+" table").getBoundingClientRect()[parametr];
+    }
     /**
      * [[Проверяет входные параметры]]
      * @param   {[[number]]} value        [[Параметр, который передан пользователем]]
