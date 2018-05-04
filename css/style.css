@@ -48,24 +48,20 @@
 .table-container .left-delete-btn,.table-container .top-delete-btn{
     background-color: #b00100;
 }
-.table-container .delete-btn:hover{
+.table-container .left-delete-btn:hover,.table-container .top-delete-btn:hover{
     background-color: #c84d4c;
 }
 .table-container .right-add-btn,.table-container .bottom-add-btn{
     background-color: #f1a417;
 }
-
-.table-container .add-btn:hover{
+.table-container .right-add-btn:hover,.table-container .bottom-add-btn:hover{
     background-color: #f5bf5c;   
-}
-.table-container .column{
-    float: left;
 }
 .table-container .btn-show{
    visibility: visible;
 }
 .table-container .left-delete-btn{
-    left:-53px;=
+    left:-53px;
 }
 .table-container .top-delete-btn{
     top:-53px;
