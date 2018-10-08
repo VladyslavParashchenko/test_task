@@ -1,88 +1,122 @@
 'use strict';
 
+
+class Table {
+    static get TABLE_DEFAULT_ROW() {
+        return 4;
+    }
+    static get TABLE_DEFAULT_COLUMN() {
+        return 4;
+    }
+    static get TABLE_ADD_CHAR() {
+        return '+';
+    }
+    static get TABLE_DELETE_CHAR(){
+        return '-';
+    }
+    /**
+     * [[Проверяет входные параметры]]
+     * @param   {[[number]]} value        [[Параметр, который передан пользователем]]
+     * @param   {[[number]]} defaultValue [[Стандартное значение параметра]]
+     * @returns {[[number]]} [[Если входной параметр валидный, то параметр, если нет - стандартное значение]]
+     */
+    validateParam(value, defaultValue) {
+        value = value * 1;
+        if (!Number.isInteger(value)) {
+            return defaultValue;
+        }
+        if (value > 0) {
+            return value;
+        }
+        return defaultValue;
+    }
+
+}
 /**
  * 
  * 
  * @param   {string} tableClassName [[Селектор блока, где хранится строка]]
  */
-function SmartTable(tableClassName, _columnCount, _rowCount, _cellSize) {
-    var rowCount = validateParametr(_rowCount, SmartTable.TABLE_DEFAULT_ROW);
-    var columnCount = validateParametr(_columnCount, SmartTable.TABLE_DEFAULT_COLUMN);
-    var cellSize = validateParametr(_cellSize, SmartTable.TABLE_CELL_SIZE);
-    var isUserReturnCursor = false;
-    var that = this;
-    var currentColumn;
-    var currentRow;
-    this.start = function () {
-        setHTML();
-        setEventListenter();
+
+class SmartTable extends Table{
+    constructor(tableClassName, columnCount, rowCount, cellSize){
+        super();
+        this.tableClassName = tableClassName;
+        this.RowCount = super.validateParam(rowCount, SmartTable.TABLE_DEFAULT_ROW);
+        this.ColumnCount = super.validateParam(columnCount, SmartTable.TABLE_DEFAULT_COLUMN);
+        this.isUserReturnCursor = false;
+        this.currentColumn;
+        this.currentRow;
+    }
+    start() {
+        this.setHTML();
+        this.setEventListenter();
     }
 
     /**
      * [[Вставляет сгенерированную HTML разметку в блок]]
      */
-    function setHTML() {
-        var html = getHTML();
-        document.querySelector(tableClassName).innerHTML = html;
+    setHTML() {
+        document.querySelector(this.tableClassName).innerHTML = this.getHTML();
     }
 
     /**
      * [[Добавляет event listeners]]
      */
-    function setEventListenter() {
-        var query = tableClassName;
-        document.querySelector(query).addEventListener('mouseover', showButtons);
-        document.querySelector(query).addEventListener('mouseleave', hideButtons);
-        document.querySelector(tableClassName + ' .left-delete-btn').onclick = deleteRow;
-        document.querySelector(tableClassName + ' .right-add-btn').onclick = addColumn;
-        document.querySelector(tableClassName + ' .bottom-add-btn').onclick = addRow;
-        document.querySelector(tableClassName + ' .top-delete-btn').onclick = deleteColumn;
+    setEventListenter() {
+        let query = this.tableClassName;
+        document.querySelector(query).addEventListener('mouseover', this.showButtons.bind(this));
+        document.querySelector(query).addEventListener('mouseleave', this.hideButtons.bind(this));
+        document.querySelector(this.tableClassName + ' .left-delete-btn').addEventListener('click', this.deleteRow.bind(this));
+        document.querySelector(this.tableClassName + ' .right-add-btn').addEventListener('click',this.addColumn.bind(this));
+        document.querySelector(this.tableClassName + ' .bottom-add-btn').addEventListener('click',this.addRow.bind(this));
+        document.querySelector(this.tableClassName + ' .top-delete-btn').addEventListener('click',this.deleteColumn.bind(this));
     }
     /**
      * [[Сетер для количества строк]]
-     * @param {[[number]]} number [[Новое количество строк]]
+     * @param {[[number]]} value [[Новое количество строк]]
      */
-    this.setRowCount = function (number) {
-        rowCount = number >= 1 ? number : rowCount;
+    set rowCount(value) {
+        this.RowCount = value >= 1 ? value : this.RowCount;
     }
     /**
      * [[Сетер для количества колонок]]
-     * @param {[[number]]} number [[Новое количество строк]]
+     * @param {[[number]]} value [[Новое количество строк]]
      */
-    this.setColumnCount = function (number) {
-        columnCount = number >= 1 ? number : columnCount;
+    set columnCount(value) {
+        this.ColumnCount = value >= 1 ? value : this.ColumnCount;
     }
     /**
      * 
      * @returns {[[number]]} [[Возвращает количество строк]]
      */
-    this.getRowCount = function () {
-        return rowCount;
+    get rowCount() {
+        return this.RowCount;
     }
     /**
      * 
      * @returns {[[number]]} [[Возвращает количество столбцов]]
      */
-    this.getColumnCount = function () {
-        return columnCount;
+    get columnCount() {
+        return this.ColumnCount;
     }
 
     /**
      * [[Возвращает готовую HTML разметку для таблицы]]
      * @returns {[[string]]} [[html разметка]]
      */
-    function getHTML() {
-        var html = getHTMLCodeOuterTable();
-        html = html.replace('_inner_table', getHTMLCodeInnerTable());
+    getHTML() {
+        let html = this.getHTMLCodeOuterTable();
+        html = html.replace('_inner_table', this.getHTMLCodeInnerTable());
         return html;
     }
 
     /**
      * [[Возвращает внешнюю html разметку(кнопки+контейнер для таблицы)]]
-     * @returns {[[Type]]} [[Description]]
+     * @returns {string} [[html code]]
      */
-    function getHTMLCodeOuterTable() {
-        var html = `
+    getHTMLCodeOuterTable() {
+        let html = `
         <button class="st-btn left-delete-btn">${SmartTable.TABLE_DELETE_CHAR}</button>
         <button class="st-btn top-delete-btn ">${SmartTable.TABLE_DELETE_CHAR}</button><button class="st-btn right-add-btn">${SmartTable.TABLE_ADD_CHAR}</button><button class="st-btn bottom-add-btn">${SmartTable.TABLE_ADD_CHAR}</button>
         _inner_table`;
@@ -93,12 +127,12 @@ function SmartTable(tableClassName, _columnCount, _rowCount, _cellSize) {
      * [[Возвращает разметку для основной таблицы]]
      * @returns {[[string]]} [[html]]
      */
-    function getHTMLCodeInnerTable() {
-        var html = '<table class="inner-table">';
-        for (var i = 0; i < that.getRowCount(); i++) {
+    getHTMLCodeInnerTable() {
+        let html = '<table class="inner-table">';
+        for (let i = 0; i < this.rowCount; i++) {
             html += '<tr>';
-            for (var j = 0; j < that.getColumnCount(); j++) {
-                html += generateTd(j, i);
+            for (let j = 0; j < this.columnCount; j++) {
+                html += this.generateTd(j, i);
             }
             html += '</tr>';
         }
@@ -112,7 +146,7 @@ function SmartTable(tableClassName, _columnCount, _rowCount, _cellSize) {
      * @returns {[[string]]} [[td html element]]
      */
 
-    function generateTd(column, row) {
+    generateTd(column, row) {
         return `<td class="inner-table-td" data-column='${column}' data-row='${row}'></td>`;
     }
     /**
@@ -121,9 +155,9 @@ function SmartTable(tableClassName, _columnCount, _rowCount, _cellSize) {
      * @param {[[number]]} column     [[номер колонки на которой должна находится кнопка]]
      * @param {[[number]]} row        [[номер строки на которой должна находится кнопка]]
      */
-    function showHorizontButton(buttonType, column, row) {
-        var button = document.querySelector(buttonType);
-        var left = Math.round((column / that.getColumnCount()) * getTableSizeParametr('width'));
+    showHorizontButton(buttonType, column, row) {
+        let button = document.querySelector(buttonType);
+        let left = Math.round((column / this.ColumnCount) * this.getTableSizeParam('width'));
         button.style.left = left + 'px';
         button.classList.add('btn-show');
     }
@@ -134,9 +168,9 @@ function SmartTable(tableClassName, _columnCount, _rowCount, _cellSize) {
      * @param {[[number]]} column     [[номер колонки на которой должна находится кнопка]]
      * @param {[[number]]} row        [[номер строки на которой должна находится кнопка]]
      */
-    function showVerticalButton(buttonType, column, row, parametr) {
-        var button = document.querySelector(buttonType);
-        var top = Math.round((row / that.getRowCount()) * getTableSizeParametr('height'));
+    showVerticalButton(buttonType, column, row) {
+        let button = document.querySelector(buttonType);
+        let top = Math.round((row / this.RowCount) * this.getTableSizeParam('height'));
         button.style['top'] = top + 'px';
         button.classList.add('btn-show');
     }
@@ -146,9 +180,9 @@ function SmartTable(tableClassName, _columnCount, _rowCount, _cellSize) {
      * @param   {object} target [[Елемент на который навели курсором]]
      * @returns {object} [[Объект с параметрами строки и колонки]]
      */
-    function getRowAndColumn(target) {
-        var c = target.dataset.column * 1;
-        var r = target.dataset.row * 1;
+    getRowAndColumn(target) {
+        let c = target.dataset.column * 1;
+        let r = target.dataset.row * 1;
         return {
             column: c,
             row: r
@@ -159,25 +193,25 @@ function SmartTable(tableClassName, _columnCount, _rowCount, _cellSize) {
      * [[Функция, которая должна показать нужные кнопки]]
      * @param {[[object]]} e [[объект события]]
      */
-    function showButtons(e) {
+    showButtons(e) {
         switch (e.target.tagName) {
             case "TD":
-                var element = e.target;
-                var obj = getRowAndColumn(element);
-                currentColumn = obj.column;
-                currentRow = obj.row;
-                if (that.getColumnCount() > 1) {
-                    showHorizontButton(tableClassName + ' .top-delete-btn', obj.column, obj.row);
+                let element = e.target;
+                let obj = this.getRowAndColumn(element);
+                this.currentColumn = obj.column;
+                this.currentRow = obj.row;
+                if (this.ColumnCount > 1) {
+                    this.showHorizontButton(this.tableClassName + ' .top-delete-btn', obj.column, obj.row);
                 }
-                showHorizontButton(tableClassName + ' .bottom-add-btn', obj.column, obj.row);
-                if (that.getRowCount() > 1) {
-                    showVerticalButton(tableClassName + ' .left-delete-btn', obj.column, obj.row);
+                this.showHorizontButton(this.tableClassName + ' .bottom-add-btn', obj.column, obj.row);
+                if (this.RowCount > 1) {
+                    this.showVerticalButton(this.tableClassName + ' .left-delete-btn', obj.column, obj.row);
                 }
-                showVerticalButton(tableClassName + ' .right-add-btn', obj.column, obj.row);
-                isUserReturnCursor = false;
+                this.showVerticalButton(this.tableClassName + ' .right-add-btn', obj.column, obj.row);
+                this.isUserReturnCursor = false;
                 break;
             case "BUTTON":
-                buttonOver(e.target);
+                this.buttonOver(e.target);
                 break;
         }
     }
@@ -185,11 +219,12 @@ function SmartTable(tableClassName, _columnCount, _rowCount, _cellSize) {
      * [[Функция, которая должна спрятать не нужные кнопки]]
      * @param {[[object]]} e [[объект события]]
      */
-    function hideButtons(e) {
-        isUserReturnCursor = true;
+    hideButtons(e) {
+        this.isUserReturnCursor = true;
         setTimeout(() => {
-            document.querySelectorAll(tableClassName + ' .st-btn').forEach(function (element) {
-                if (isUserReturnCursor) {
+            let that = this;
+            document.querySelectorAll(this.tableClassName + ' .st-btn').forEach(function (element) {
+                if (that.isUserReturnCursor) {
                     element.classList.remove('btn-show');
                 }
             })
@@ -200,11 +235,10 @@ function SmartTable(tableClassName, _columnCount, _rowCount, _cellSize) {
      * [[Функция, которая должна показать кнопку, на которую наведен курсор]]
      * @param {[[object]]} e [[объект события]]
      */
-    function buttonOver(e) {
-        isUserReturnCursor = false;
-        var self = e;
+    buttonOver(e) {
+        this.isUserReturnCursor = false;
         document.querySelectorAll('.st-btn').forEach(function (elem) {
-            if (self != elem) {
+            if (e !== elem) {
                 elem.classList.remove('btn-show');
             }
         });
@@ -214,7 +248,7 @@ function SmartTable(tableClassName, _columnCount, _rowCount, _cellSize) {
      * [[Функция, которая должна скрыть кнопку, на которую не наведен курсор]]
      * @param {[[object]]} e [[объект события]]
      */
-    function buttonMouseOut(e) {
+    buttonMouseOut(e) {
         this.classList.remove('btn-show');
     }
 
@@ -222,61 +256,60 @@ function SmartTable(tableClassName, _columnCount, _rowCount, _cellSize) {
      * [[Удаляет строку в таблице]]
      * @param {[[object]]} e [[объект события]]
      */
-    function deleteRow(e) {
-        var query = tableClassName + ` td[data-row='${currentRow}']`;
+    deleteRow(e) {
+        e.target.classList.remove('btn-show');
+        let query = this.tableClassName + ` td[data-row='${this.currentRow}']`;
         document.querySelector(query).parentNode.remove();
-        that.setRowCount(that.getRowCount() - 1);
-        this.classList.remove('btn-show');
-        document.querySelector(tableClassName + ' .bottom-add-btn').style.top = that.getRowCount() * cellSize + 'px';
-        renumarateTd();
+        this.RowCount = this.RowCount- 1;
+        this.renumarateTd();
     }
     /**
      * [[Удаляет колонку в таблице]]
      * @param {[[object]]} e [[объект события]]
      */
-    function deleteColumn(e) {
-        this.classList.remove('btn-show');
-        var query = tableClassName + ` td[data-column='${currentColumn}']`;
+    deleteColumn(e) {
+        e.target.classList.remove('btn-show');
+        let query = this.tableClassName + ` td[data-column='${this.currentColumn}']`;
         document.querySelectorAll(query).forEach(function (elem) {
             elem.remove()
         });
-        that.setColumnCount(that.getColumnCount() - 1);
-        renumarateTd();
+        this.ColumnCount = this.ColumnCount - 1;
+        this.renumarateTd();
     }
     /**
      * [[Добавляет новую строку в таблицу]]
      * @param {[[object]]} e [[объект события]]
      */
-    function addRow(e) {
-        var tr = "<tr>";
-        for (var i = 0; i < that.getColumnCount(); i++) {
-            tr += generateTd(i, that.getRowCount());
+    addRow(e) {
+        let tr = "<tr>";
+        for (let i = 0; i < this.ColumnCount; i++) {
+            tr += this.generateTd(i, this.RowCount);
         }
         tr += "</tr>";
-        that.setRowCount(that.getRowCount() + 1);
-        document.querySelector(tableClassName + " table tbody").innerHTML += tr;
+        this.RowCount = this.RowCount + 1;
+        document.querySelector(this.tableClassName + " table tbody").innerHTML += tr;
     }
     /**
      * [[Добавляет новую колонку в таблицу]]
      * @param {[[object]]} e [[объект события]]
      */
-    function addColumn(e) {
-        document.querySelectorAll(tableClassName + " table tbody tr").forEach(function (item, i) {
-            item.innerHTML += generateTd(that.getColumnCount(), i);
+    addColumn(e) {
+        let that = this;
+        document.querySelectorAll(this.tableClassName + " table tbody tr").forEach(function (item, i) {
+            item.innerHTML += that.generateTd(that.ColumnCount, i);
         });
-        that.setColumnCount(that.getColumnCount() + 1);
-
+        this.ColumnCount = this.ColumnCount + 1;
     }
     /**
      * [[Проставляет новые номера строк и колонок, после удаления]]
      */
-    function renumarateTd() {
-        var trElements = document.querySelectorAll(tableClassName + " table tr");
-        var tdElements;
-        var tdElement;
-        for (var i = 0; i < trElements.length; i++) {
+    renumarateTd() {
+        let trElements = document.querySelectorAll(this.tableClassName + " table tr");
+        let tdElements;
+        let tdElement;
+        for (let i = 0; i < trElements.length; i++) {
             tdElements = trElements[i].childNodes;
-            for (var j = 0; j < tdElements.length; j++) {
+            for (let j = 0; j < tdElements.length; j++) {
                 tdElement = tdElements[j];
                 tdElement.dataset.row = i;
                 tdElement.dataset.column = j;
@@ -285,34 +318,10 @@ function SmartTable(tableClassName, _columnCount, _rowCount, _cellSize) {
     }
     /**
      * [[Функция для получения значения размеров таблицы]]
-     * @param   {[[string]} parametr [[параметр который мы получим]]
+     * @param   {[[string]} param [[параметр который мы получим]]
      * @returns {[[number]]} [[значения параметра]]
      */
-    function getTableSizeParametr(parametr) {
-        return document.querySelector(tableClassName + " table").getBoundingClientRect()[parametr];
+    getTableSizeParam(param) {
+        return document.querySelector(this.tableClassName + " table").getBoundingClientRect()[param];
     }
-    /**
-     * [[Проверяет входные параметры]]
-     * @param   {[[number]]} value        [[Параметр, который передан пользователем]]
-     * @param   {[[number]]} defaultValue [[Стандартное значение параметра]]
-     * @returns {[[number]]} [[Если входной параметр валидный, то параметр, если нет - стандартное значение]]
-     */
-    function validateParametr(value, defaultValue) {
-        value = value * 1;
-        if (!Number.isInteger(value)) {
-            return defaultValue;
-        }
-        if (value > 0) {
-            return value;
-        }
-        return defaultValue;
-    }
-
 }
-SmartTable.TABLE_DEFAULT_ROW = 4;
-SmartTable.TABLE_DEFAULT_COLUMN = 4;
-SmartTable.TABLE_ADD_CHAR = '+';
-SmartTable.TABLE_DELETE_CHAR = '-';
-SmartTable.TABLE_BUTTON_DEFAULT_TOP_VALUE = 55;
-SmartTable.TABLE_BUTTON_DEFAULT_LEFT_VALUE = 0;
-SmartTable.TABLE_CELL_SIZE = 55;
