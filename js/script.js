@@ -33,8 +33,8 @@ class Table {
 
 }
 /**
- * 
- * 
+ *
+ *
  * @param   {string} tableClassName [[Селектор блока, где хранится строка]]
  */
 
@@ -87,14 +87,14 @@ class SmartTable extends Table{
         this.ColumnCount = value >= 1 ? value : this.ColumnCount;
     }
     /**
-     * 
+     *
      * @returns {[[number]]} [[Возвращает количество строк]]
      */
     get rowCount() {
         return this.RowCount;
     }
     /**
-     * 
+     *
      * @returns {[[number]]} [[Возвращает количество столбцов]]
      */
     get columnCount() {
@@ -228,7 +228,7 @@ class SmartTable extends Table{
                     element.classList.remove('btn-show');
                 }
             })
-        }, 500);
+        }, 3000);
     }
 
     /**
