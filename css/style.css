@@ -13,9 +13,9 @@
     left: 0;
     display: flex;
     align-items: center;
-    align-content: center; 
-    justify-content: center; 
-    overflow: auto;  
+    align-content: center;
+    justify-content: center;
+    overflow: auto;
 }
 .table-container{
     position: relative;
@@ -45,6 +45,8 @@
     height: 50px;
     border:none;
     margin:2px;
+}
+.table-container .del-btn{
     visibility: hidden;
 }
 .table-container .left-delete-btn,.table-container .top-delete-btn{
@@ -57,7 +59,7 @@
     background-color: #f1a417;
 }
 .table-container .right-add-btn:hover,.table-container .bottom-add-btn:hover{
-    background-color: #f5bf5c;   
+    background-color: #f5bf5c;
 }
 .table-container .btn-show{
    visibility: visible;

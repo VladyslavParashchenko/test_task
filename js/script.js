@@ -117,8 +117,8 @@ class SmartTable extends Table{
      */
     getHTMLCodeOuterTable() {
         let html = `
-        <button class="st-btn left-delete-btn">${SmartTable.TABLE_DELETE_CHAR}</button>
-        <button class="st-btn top-delete-btn ">${SmartTable.TABLE_DELETE_CHAR}</button><button class="st-btn right-add-btn">${SmartTable.TABLE_ADD_CHAR}</button><button class="st-btn bottom-add-btn">${SmartTable.TABLE_ADD_CHAR}</button>
+        <button class="st-btn left-delete-btn del-btn">${SmartTable.TABLE_DELETE_CHAR}</button>
+        <button class="st-btn top-delete-btn del-btn">${SmartTable.TABLE_DELETE_CHAR}</button><button class="st-btn right-add-btn">${SmartTable.TABLE_ADD_CHAR}</button><button class="st-btn bottom-add-btn">${SmartTable.TABLE_ADD_CHAR}</button>
         _inner_table`;
         return html;
     }
@@ -203,11 +203,9 @@ class SmartTable extends Table{
                 if (this.ColumnCount > 1) {
                     this.showHorizontButton(this.tableClassName + ' .top-delete-btn', obj.column, obj.row);
                 }
-                this.showHorizontButton(this.tableClassName + ' .bottom-add-btn', obj.column, obj.row);
                 if (this.RowCount > 1) {
                     this.showVerticalButton(this.tableClassName + ' .left-delete-btn', obj.column, obj.row);
                 }
-                this.showVerticalButton(this.tableClassName + ' .right-add-btn', obj.column, obj.row);
                 this.isUserReturnCursor = false;
                 break;
             case "BUTTON":
@@ -223,7 +221,7 @@ class SmartTable extends Table{
         this.isUserReturnCursor = true;
         setTimeout(() => {
             let that = this;
-            document.querySelectorAll(this.tableClassName + ' .st-btn').forEach(function (element) {
+            document.querySelectorAll(this.tableClassName + ' .del-btn').forEach(function (element) {
                 if (that.isUserReturnCursor) {
                     element.classList.remove('btn-show');
                 }
@@ -244,14 +242,6 @@ class SmartTable extends Table{
         });
 
     }
-    /**
-     * [[Функция, которая должна скрыть кнопку, на которую не наведен курсор]]
-     * @param {[[object]]} e [[объект события]]
-     */
-    buttonMouseOut(e) {
-        this.classList.remove('btn-show');
-    }
-
     /**
      * [[Удаляет строку в таблице]]
      * @param {[[object]]} e [[объект события]]
